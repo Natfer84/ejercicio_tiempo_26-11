@@ -1,29 +1,35 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js';
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAyWFcVX2LBdEEMTWVN_ELCNHcvO0TfI6E",
-    authDomain: "ifcd77.firebaseapp.com",
-    projectId: "ifcd77",
-    storageBucket: "ifcd77.appspot.com",
-    messagingSenderId: "717166649638",
-    appId: "1:717166649638:web:0b6d7d9086158fb3ee21e7"
-};
+//import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+ // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+  // Your web app's Firebase configuration
+
+// configuro los datos con la BD que he creado
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQZ_kaAFlYG0QMtVuFBFbY7zyxn6xlg30",
+    authDomain: "ejercicio-con-tiempo-26-11.firebaseapp.com",
+    projectId: "ejercicio-con-tiempo-26-11",
+    storageBucket: "ejercicio-con-tiempo-26-11.firebasestorage.app",
+    messagingSenderId: "610766481122",
+    appId: "1:610766481122:web:d42e4e5cfe6d42f8fd20bb"
+  };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 export async function getTasks() {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
+    const querySnapshot = await getDocs(collection(db, "trabajo"));
     querySnapshot.forEach((doc) => {
         createCard(doc.id, doc.data());
     });
 }
 
-function createCard(id, task) {
+function createCard(id, trabajo) {
     const principalDiv = document.createElement('div');
     principalDiv.setAttribute("class", "card bg-light mb-3");
     principalDiv.style = "max-width: 20rem;";
@@ -37,10 +43,10 @@ function createCard(id, task) {
 
     const bodyDiv = document.createElement('div');
     const pTitle = document.createElement("p");
-    const pTitleText = document.createTextNode("Title: " + task.title);
+    const pTitleText = document.createTextNode("Titulo: " + trabajo.titulo);
     const hr = document.createElement('hr');
     const pDesc = document.createElement("p");
-    const pDescText = document.createTextNode("Description: " + task.description);
+    const pDescText = document.createTextNode("Description: " + trabajo.descripcion);
 
     pTitle.appendChild(pTitleText);
     bodyDiv.appendChild(pTitle);
@@ -72,12 +78,12 @@ function generateRandomIdTask(num) {
     return result;
 }
 
-export async function insertTask(task) {
-    await setDoc(doc(db, "tasks", generateRandomIdTask(20)), task);
-    alert("Insertada la tarea: " + task.title);
+export async function insertTask(trabajo) {
+    await setDoc(doc(db, "trabajo", generateRandomIdTask(20)), trabajo);
+    alert("Insertada la tarea: " + trabajo.titulo);
 }
 
 export async function deleteTask(id) {
-    await deleteDoc(doc(db, "tasks", id));
+    await deleteDoc(doc(db, "trabajo", id));
     alert("Borrada la tarea: " + id);
 }

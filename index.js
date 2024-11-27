@@ -10,12 +10,12 @@
     const form = document.getElementById("task-form");
     form.addEventListener("submit", e => {
         e.preventDefault();
-        const task = {
+        const trabajo = {
             title: form["task-title"].value,
             description: form["task-description"].value
         }
-
-        insertTask(task);
+        console.log("Datos del trabajo:", trabajo);
+        insertTask(trabajo);
     })
 
 
