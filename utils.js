@@ -1,27 +1,21 @@
-// Import the functions you need from the SDKs you need
+// Importar las funciones necesarias de Firebase Firestore
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';  // <-- Aquí
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
 
-// Your web app's Firebase configuration
-//import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
- // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-  // Your web app's Firebase configuration
-
-// configuro los datos con la BD que he creado
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-  const firebaseConfig = {
+// Configuración e inicialización de Firebase
+const firebaseConfig = {
     apiKey: "AIzaSyCQZ_kaAFlYG0QMtVuFBFbY7zyxn6xlg30",
     authDomain: "ejercicio-con-tiempo-26-11.firebaseapp.com",
     projectId: "ejercicio-con-tiempo-26-11",
     storageBucket: "ejercicio-con-tiempo-26-11.firebasestorage.app",
     messagingSenderId: "610766481122",
     appId: "1:610766481122:web:d42e4e5cfe6d42f8fd20bb"
-  };
+};
 
-// Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
+// Función para obtener tareas de Firestore
 export async function getTasks() {
     const querySnapshot = await getDocs(collection(db, "trabajo"));
     querySnapshot.forEach((doc) => {
@@ -29,7 +23,8 @@ export async function getTasks() {
     });
 }
 
-function createCard(id, trabajo) {
+// Función para crear una tarjeta de tarea en la interfaz
+function createCard(id, data) {
     const principalDiv = document.createElement('div');
     principalDiv.setAttribute("class", "card bg-light mb-3");
     principalDiv.style = "max-width: 20rem;";
@@ -43,10 +38,10 @@ function createCard(id, trabajo) {
 
     const bodyDiv = document.createElement('div');
     const pTitle = document.createElement("p");
-    const pTitleText = document.createTextNode("Titulo: " + trabajo.titulo);
+    const pTitleText = document.createTextNode("Titulo: " + data.title);
     const hr = document.createElement('hr');
     const pDesc = document.createElement("p");
-    const pDescText = document.createTextNode("Description: " + trabajo.descripcion);
+    const pDescText = document.createTextNode("Description: " + data.description);
 
     pTitle.appendChild(pTitleText);
     bodyDiv.appendChild(pTitle);
@@ -54,19 +49,42 @@ function createCard(id, trabajo) {
     pDesc.appendChild(pDescText);
     bodyDiv.appendChild(pDesc);
     bodyDiv.appendChild(hr);
+    
+    // Botón de eliminar tarea
+    const deleteButton = document.createElement("input");
+    deleteButton.type = "button";
+    deleteButton.value = "Borrar Tarea";
+    deleteButton.setAttribute("name", "delete");
+    deleteButton.setAttribute("id", id);
+    bodyDiv.appendChild(deleteButton);
 
-    const input = document.createElement("input");
-    input.type = "button";
-    input.value = "Borrar Tarea";
-    input.setAttribute("name", "delete");
-    input.setAttribute("id", id);
-    bodyDiv.appendChild(input);
+    // Botón de actualizar tarea
+    const updateButton = document.createElement("input");
+    updateButton.type = "button";
+    updateButton.value = "Actualizar Tarea";
+    updateButton.setAttribute("name", "update");
+    updateButton.setAttribute("id", id);
+    bodyDiv.appendChild(updateButton);
 
     principalDiv.appendChild(bodyDiv);
     document.body.appendChild(principalDiv);
     const br = document.createElement("br");
     document.body.appendChild(br);
+
+    // Añadir eventos para botones
+    deleteButton.addEventListener("click", () => deleteTask(id));
+    updateButton.addEventListener("click", () => mostrarFormularioEditar(id, data.title, data.description));
 }
+
+// Función para mostrar el formulario de edición con los datos de la tarea seleccionada
+export function mostrarFormularioEditar(id, title, description) {
+    document.getElementById("task-titles").value = title;
+    document.getElementById("task-descriptions").value = description;
+    document.getElementById("contenedorActualizar").style.display = "block";
+    const formActualizar = document.getElementById("formActualizarTarea");
+    formActualizar.setAttribute("data-id", id);
+}
+
 
 function generateRandomIdTask(num) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -78,12 +96,25 @@ function generateRandomIdTask(num) {
     return result;
 }
 
+// Función para insertar una nueva tarea en Firestore
 export async function insertTask(trabajo) {
     await setDoc(doc(db, "trabajo", generateRandomIdTask(20)), trabajo);
-    alert("Insertada la tarea: " + trabajo.titulo);
+    alert("Insertada la tarea: " + trabajo.title);
 }
 
+// Función para eliminar una tarea de Firestore
 export async function deleteTask(id) {
     await deleteDoc(doc(db, "trabajo", id));
     alert("Borrada la tarea: " + id);
+}
+
+// Función para actualizar una tarea en Firestore
+export async function updateTask(id, updatedTask) {
+    const taskDoc = doc(db, "trabajo", id);
+    try {
+        await updateDoc(taskDoc, updatedTask);
+        alert("Tarea actualizada con éxito");
+    } catch (e) {
+        console.error("Error actualizando la tarea: ", e);
+    }
 }
